@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Calculator</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .heading {
+            font-size: 80px;
+            font-weight: 800;
+            font-family: Raleway, sans-serif;
+            color: white;
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: gray;
+
+        }
+
+        .calculator {
+            background-color: black;
+            box-shadow: 5px 5px 5px 5px black;
+            border-radius: 15px;
+            padding: 10px;
+            width: 500px;
+            height: 380px;
+        }
+
+        input[type="text"],
+        input[type="button"] {
+            margin: 5px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 4px);
+            height: 80px;
+            color: black;
+            font-size: xx-large;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #ffffff80;
+        }
+
+        .specialbuttons:hover {
+            width: 119.5px;
+            background-color: #ffffff80;
+        }
+
+        input[type="button"] {
+            border-radius: 10px;
+            border: solid 4px #fff;
+            background-color: #ccc;
+            width: 109.7px;
+            height: 60px;
+            color: black;
+            font-size: xx-large;
+            font-family: Raleway, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <p class="heading">A Simple Calculator</p>
+        <div class="calculator">
+            <input type="text" id="display" disabled>
+            <div class="row">
+                <input type="button" value="1" onclick="appendNumber('1')">
+                <input type="button" value="2" onclick="appendNumber('2')">
+                <input type="button" value="3" onclick="appendNumber('3')">
+                <div class="specialbuttons">
+                    <input type="button" type="special-buttons" style="background-color: #FFCC00;" value="+"
+                        onclick="setOperation('+')">
+                </div>
+            </div>
+            <div class="row">
+                <input type="button" value="4" onclick="appendNumber('4')">
+                <input type="button" value="5" onclick="appendNumber('5')">
+                <input type="button" value="6" onclick="appendNumber('6')">
+                <div class="specialbuttons">
+                    <input type="button" type="special-buttons" style="background-color:#FFCC00 ;" value="-"
+                        onclick="setOperation('-')">
+                </div>
+
+            </div>
+            <div class="row">
+                <input type="button" value="7" onclick="appendNumber('7')">
+                <input type="button" value="8" onclick="appendNumber('8')">
+                <input type="button" value="9" onclick="appendNumber('9')">
+
+                <div class="specialbuttons">
+                    <input type="button" type="special-buttons" style="background-color:#FFCC00 ;" value="*"
+                        onclick="setOperation('*')">
+                </div>
+            </div>
+            <div class="row">
+                <div class="specialbuttons">
+                    <input type="button" type="special-buttons" style="background-color: orange;" value="C"
+                        onclick="clearDisplay()">
+
+                </div> <input type="button" value="0" onclick="appendNumber('0')">
+                <input type="button" value="=" onclick="calculate()">
+                <div class="specialbuttons">
+                    <input type="button" type="special-buttons" style="background-color: #FFCC00;" value="/"
+                        onclick="setOperation('/')">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentOperation = null;
+        let currentNumber = "";
+        let previousNumber = "";
+        let displayValue = ""; // New variable to keep track of what's displayed
+
+        function appendNumber(number) {
+            currentNumber += number;
+            displayValue = previousNumber + (currentOperation ? ` ${currentOperation} ` : "") + currentNumber; // Update displayValue
+            updateDisplay(displayValue);
+        }
+
+        function setOperation(operation) {
+            if (currentNumber === "" && previousNumber === "" && operation !== "-") { // Allow negative numbers as first input
+                return;
+            } else if (currentNumber === "" && previousNumber !== "" && operation === "-") { // Allow changing to subtraction for negative numbers
+                currentNumber = "-";
+                updateDisplay(previousNumber + " " + operation);
+                return;
+            }
+            if (previousNumber !== "" && currentNumber !== "") {
+                calculate();
+            } else if (currentNumber === "") {
+                // This allows changing the operation before entering the second number
+                currentOperation = operation;
+                displayValue = previousNumber + ` ${operation} `;
+                updateDisplay(displayValue);
+                return;
+            }
+            currentOperation = operation;
+            previousNumber = currentNumber;
+            currentNumber = "";
+            // Update displayValue to include the operation
+            displayValue = previousNumber + ` ${operation} `; 
+            updateDisplay(displayValue);
+        }
+
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousNumber);
+            const current = parseFloat(currentNumber);
+            if (isNaN(prev) || isNaN(current)) return;
+            switch (currentOperation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert("Division by zero is not allowed.");
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            currentNumber = result.toString();
+            currentOperation = null;
+            previousNumber = "";
+            displayValue = currentNumber; // Reset displayValue to just the result
+            updateDisplay(displayValue);
+        }
+
+        function clearDisplay() {
+            currentNumber = "";
+            previousNumber = "";
+            currentOperation = null;
+            displayValue = ""; // Clear the displayValue
+            updateDisplay(displayValue);
+        }
+
+        function updateDisplay(value = "") {
+            document.getElementById('display').value = value;
+        }
+    </script>
+
+</body>
+
+</html>
